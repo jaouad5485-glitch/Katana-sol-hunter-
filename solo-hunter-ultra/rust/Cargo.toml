@@ -1,0 +1,26 @@
+[workspace]
+members = [
+  "crates/sh_sniffer",
+  "crates/filter_stack",
+  "crates/tx_builder",
+  "crates/execution",
+  "crates/rpc_pool",
+  "crates/state_cache",
+  "crates/wallet",
+  "crates/intelligence",
+  "crates/metrics",
+  "crates/hunterd",
+]
+resolver = "2"
+
+[workspace.package]
+edition = "2021"
+rust-version = "1.78"
+license = "MIT"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = true

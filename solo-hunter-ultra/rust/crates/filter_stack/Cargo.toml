@@ -1,0 +1,12 @@
+[package]
+name = "filter_stack"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+sh_sniffer = { path = "../sh_sniffer" }
+state_cache = { path = "../state_cache" }
+intelligence = { path = "../intelligence" }
+metrics = { path = "../metrics" }

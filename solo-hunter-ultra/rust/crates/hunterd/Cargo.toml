@@ -1,0 +1,21 @@
+[package]
+name = "hunterd"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+execution = { path = "../execution" }
+filter_stack = { path = "../filter_stack" }
+intelligence = { path = "../intelligence" }
+metrics = { path = "../metrics" }
+rpc_pool = { path = "../rpc_pool" }
+sh_sniffer = { path = "../sh_sniffer" }
+state_cache = { path = "../state_cache" }
+tx_builder = { path = "../tx_builder" }
+wallet = { path = "../wallet" }
+
+[[bin]]
+name = "hunterd"
+path = "src/main.rs"

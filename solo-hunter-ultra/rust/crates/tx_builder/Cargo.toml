@@ -1,0 +1,10 @@
+[package]
+name = "tx_builder"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+sh_sniffer = { path = "../sh_sniffer" }
+filter_stack = { path = "../filter_stack" }
