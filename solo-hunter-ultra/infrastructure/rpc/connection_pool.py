@@ -13,6 +13,11 @@ import structlog
 LOGGER = structlog.get_logger(__name__)
 
 
+class SecurityError(Exception):
+    """Raised when security validation fails."""
+    pass
+
+
 @dataclass(slots=True)
 class RpcEndpoint:
     """RPC endpoint health and latency state."""
@@ -26,11 +31,46 @@ class RpcEndpoint:
     last_checked: float = field(default_factory=monotonic)
 
 
+def _validate_https(url: str) -> str:
+    """
+    Validate that URL uses HTTPS for production security.
+    
+    Args:
+        url: The RPC endpoint URL to validate.
+        
+    Returns:
+        The validated URL if secure.
+        
+    Raises:
+        SecurityError: If URL does not use HTTPS.
+    """
+    if not url.startswith("https://"):
+        raise SecurityError(f"RPC endpoint must use HTTPS in production: {url}. Got: {url[:20]}...")
+    return url
+
+
 class RpcConnectionPool:
     """Multi-endpoint RPC pool with failover and latency-weighted selection."""
 
-    def __init__(self, endpoints: list[dict[str, Any]], timeout: float = 2.0, max_connections: int = 50) -> None:
-        self.endpoints = [RpcEndpoint(**endpoint) for endpoint in endpoints]
+    def __init__(
+        self,
+        endpoints: list[dict[str, Any]],
+        timeout: float = 2.0,
+        max_connections: int = 50,
+        enforce_https: bool = True,
+    ) -> None:
+        self._enforce_https = enforce_https
+        self.endpoints = []
+        for endpoint in endpoints:
+            url = endpoint.get("url", "")
+            if self._enforce_https:
+                validated_url = _validate_https(url)
+                LOGGER.info("rpc_endpoint_validated", url=validated_url, secure=True)
+            else:
+                validated_url = url
+                LOGGER.warning("rpc_endpoint_https_disabled", url=url[:30], warning="HTTPS validation bypassed")
+            endpoint["url"] = validated_url
+            self.endpoints.append(RpcEndpoint(**endpoint))
         limits = httpx.Limits(max_connections=max_connections * max(1, len(self.endpoints)), max_keepalive_connections=max_connections)
         self._client = httpx.AsyncClient(http2=True, timeout=timeout, limits=limits)
         self._rr_index = 0
