@@ -1,11 +1,8 @@
 .env
-keys/
-data/
-*.db
+*.key
+logs/
 __pycache__/
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-.venv/
 *.pyc
-rust/target/
+target/
+*.log
+.DS_Store
